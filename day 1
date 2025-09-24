@@ -1,0 +1,66 @@
+import java.util.*;
+
+class Solution {
+    public String fractionToDecimal(int numerator, int denominator) {
+        if (numerator == 0) return "0";
+
+        StringBuilder result = new StringBuilder();
+
+        // handle sign
+        if ((numerator < 0) ^ (denominator < 0)) {
+            result.append("-");
+        }
+
+        // use long to avoid overflow (e.g. Integer.MIN_VALUE / -1)
+        long num = Math.abs((long) numerator);
+        long den = Math.abs((long) denominator);
+
+        // integer part
+        result.append(num / den);
+        long remainder = num % den;
+
+        if (remainder == 0) {
+            return result.toString();
+        }
+
+        result.append(".");
+        Map<Long, Integer> seen = new HashMap<>();
+
+        while (remainder != 0) {
+            if (seen.containsKey(remainder)) {
+                int pos = seen.get(remainder);
+                result.insert(pos, "(");
+                result.append(")");
+                break;
+            }
+
+            seen.put(remainder, result.length());
+
+            remainder *= 10;
+            result.append(remainder / den);
+            remainder %= den;
+        }
+
+        return result.toString();
+    }
+}
+
+
+example how its working 
+Input: numerator = 2, denominator = 3
+
+Sign: positive → no "-".
+
+Integer part: 2/3 = 0, remainder = 2.
+
+Decimal part:
+
+remainder = 2 → 2*10 = 20, 20/3 = 6, append "6", remainder = 2.
+
+remainder 2 already seen → repeating starts.
+
+Insert "(" before the "6" and append ")".
+
+Output: "0.(6)"
+
+
